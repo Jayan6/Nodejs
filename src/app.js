@@ -9,6 +9,11 @@ app.use("/ss", (req , res) => {
   res.send( 'Not Found' );
 }  );
 
+app.get("/user/:userId/:name/:password", (req , res) => {
+    console.log(req.params);
+  res.send( { firstName: 'Aks' , lastName: 'AKS'} );
+}  );
+
 
 
 app.listen(3000, () => {
