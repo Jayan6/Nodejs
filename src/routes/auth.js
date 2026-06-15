@@ -52,4 +52,11 @@ throw new Error("Invalid password");
   }
 });
 
+authRouter.post("/logout", (req, res) => {
+
+    res.cookie("token", null, { expires: new Date(Date.now()) }); // Clear the token cookie
+  // Implement logout logic (e.g., clear session or token)
+  res.send("Logout successful");
+});
+
 module.exports = authRouter;
