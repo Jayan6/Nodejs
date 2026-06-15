@@ -11,6 +11,12 @@ if (isAdminAuthenticated) {
 }
 };
 
+const userAuth = (_req, _res, next) => {
+    // TODO: implement real token/session validation here
+    next();
+};
+
 module.exports = {
-    adminAuth: AdminAuth
+    adminAuth: AdminAuth,
+    userAuth,
 }

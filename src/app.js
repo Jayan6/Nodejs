@@ -4,7 +4,16 @@ const connectDB = require("./config/database");
 const app = express();
 const User = require("./models/user");
 const bcrypt = require("bcrypt");
-const { validateSignupData } = require("./utils/validation");
+
+const authRouter = require("./routes/auth");
+const profileRouter = require("./routes/profile");
+const requestRouter = require("./routes/requests");
+
+app.use(express.json());
+
+app.use("/", authRouter);
+app.use("/", profileRouter);
+app.use("/", requestRouter);
 connectDB()
   .then(() => {
     console.log("Connected to MongoDB");
@@ -19,51 +28,7 @@ connectDB()
 // },  (req, res) => {
 //   res.send('User route 2');
 // });
-app.use(express.json());
 
-app.post("/signup", async (req, res) => {
-  try {
-    validateSignupData(req);
-
-    const {firstName, lastName, email, password} = req.body;
-
-    const passwordHash = await bcrypt.hash(password, 10);
-  console.log("Password hash:", passwordHash);
-    const user = new User({
-      firstName,
-      lastName,
-      email,
-      password: passwordHash,
-    });
-    await user.save();
-    res.status(201).send("User created successfully");
-  } catch (error) {
-    res.status(400).send("Error creating user: " + error.message);
-  }
-});
-
-app.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      return res.status(404).send("User not found");
-    }
-
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-
-    if (isPasswordValid) {
-      res.send("Login successful");
-    }
-      else {
-throw new Error("Invalid password");
-    }
-  } catch (error) {
-    res.status(400).send("Error logging in: " + error.message);
-  }
-});
 
 app.get("/user", async (req, res) => {
   const userEmail = req.body.email;
