@@ -1,34 +1,36 @@
-const validator = require('validator');
+const validator = require("validator");
 
-const validateSignupData = (req) => {
-  const data = req.body;
-
-  if (!data.firstName || typeof data.firstName !== 'string' || data.firstName.length < 4 || data.firstName.length > 20) {
-    throw new Error('First name must be a string between 4 and 20 characters');
+const validateSignUpData = (req) => {
+  const { firstName, lastName, emailId, password } = req.body;
+  if (!firstName || !lastName) {
+    throw new Error("Name is not valid!");
+  } else if (!validator.isEmail(emailId)) {
+    throw new Error("Email is not valid!");
+  } else if (!validator.isStrongPassword(password)) {
+    throw new Error("Please enter a strong Password!");
   }
-
-   if (data.lastName && (typeof data.lastName !== 'string' || data.lastName.length < 4 || data.lastName.length > 20)) {
-    throw new Error('Last name must be a string between 4 and 20 characters');
-  }
-
-   if (!data.email || !validator.isEmail(data.email)) {
-    throw new Error('Invalid email address');
-  }
-
 };
 
 const validateEditProfileData = (req) => {
-  const data = req.body;
-  const allowedFields = ['firstName', 'lastName', 'email' ];
+  const allowedEditFields = [
+    "firstName",
+    "lastName",
+    "emailId",
+    "photoUrl",
+    "gender",
+    "age",
+    "about",
+    "skills",
+  ];
 
- const isEditAllowed = Object.keys(data).every(field => allowedFields.includes(field));
+  const isEditAllowed = Object.keys(req.body).every((field) =>
+    allowedEditFields.includes(field)
+  );
 
-  // if (!isEditAllowed) {
-  //   throw new Error('Invalid fields in edit profile data');
-  // }
-}
+  return isEditAllowed;
+};
 
 module.exports = {
-  validateSignupData,
-  validateEditProfileData
+  validateSignUpData,
+  validateEditProfileData,
 };
