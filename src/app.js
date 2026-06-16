@@ -28,6 +28,7 @@ app.use("/", profileRouter);
 app.use("/", requestRouter);
 app.use("/", userRouter);
 
+const server = http.createServer(app);
 
 
 connectDB()
@@ -38,5 +39,6 @@ connectDB()
     });
   })
   .catch((err) => {
+    console.error("Database connection failed!!", err);
     console.error("Database cannot be connected!!");
   });
