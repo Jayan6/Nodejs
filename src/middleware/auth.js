@@ -8,11 +8,11 @@ const userAuth = async (req, res, next) => {
       return res.status(401).send("Please Login!");
     }
 
-    const decodedObj = await jwt.verify(token, process.env.JWT_SECRET);
+    const decodedObj = jwt.verify(token, process.env.JWT_SECRET);
 
-    const { _id } = decodedObj;
+    const { id } = decodedObj;
 
-    const user = await User.findById(_id);
+    const user = await User.findByPk(id);
     if (!user) {
       throw new Error("User not found");
     }
@@ -24,6 +24,4 @@ const userAuth = async (req, res, next) => {
   }
 };
 
-module.exports = {
-  userAuth,
-};
+module.exports = { userAuth };

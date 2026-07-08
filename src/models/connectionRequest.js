@@ -1,45 +1,39 @@
-const mongoose = require("mongoose");
+const { DataTypes } = require("sequelize");
+const { sequelize } = require("../config/database");
 
-const connectionRequestSchema = new mongoose.Schema(
+const ConnectionRequest = sequelize.define(
+  "ConnectionRequest",
   {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
     fromUserId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: { model: "Users", key: "id" },
     },
     toUserId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: { model: "Users", key: "id" },
     },
     status: {
-      type: String,
-      required: true,
-      enum: {
-        values: ["ignored", "interested", "accepted", "rejected"],
-        message: `{VALUE} is incorrect status type`,
-      },
+      type: DataTypes.ENUM("ignored", "interested", "accepted", "rejected"),
+      allowNull: false,
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    indexes: [{ fields: ["fromUserId", "toUserId"] }],
+  }
 );
 
-// ConnectionRequest.find({fromUserId: 273478465864786587, toUserId: 273478465864786587})
-
-connectionRequestSchema.index({ fromUserId: 1, toUserId: 1 });
-
-connectionRequestSchema.pre("save", function (next) {
-  const connectionRequest = this;
-  // Check if the fromUserId is same as toUserId
-  if (connectionRequest.fromUserId.equals(connectionRequest.toUserId)) {
+ConnectionRequest.addHook("beforeCreate", (request) => {
+  if (request.fromUserId === request.toUserId) {
     throw new Error("Cannot send connection request to yourself!");
   }
-  next();
 });
 
-const ConnectionRequestModel = new mongoose.model(
-  "ConnectionRequest",
-  connectionRequestSchema
-);
-
-module.exports = ConnectionRequestModel;
+module.exports = ConnectionRequest;
